@@ -10,16 +10,16 @@ use UMA\BicingStats\Storage\Reader;
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../app/bootstrap.php';
 
-$cnt[Twig::class] = function () {
-    return new Twig(TEMPLATES_DIR);
+$cnt[Twig::class] = function ($cnt) {
+    return new Twig($cnt['paths.templates']);
 };
 
 $cnt[IndexAction::class] = function ($cnt) {
     return new IndexAction($cnt[Twig::class]);
 };
 
-$cnt[StationAction::class] = function () {
-    return new StationAction(new Reader());
+$cnt[StationAction::class] = function ($cnt) {
+    return new StationAction(new Reader($cnt['paths.datastore']));
 };
 
 $cnt[App::class] = function ($cnt) {

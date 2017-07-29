@@ -13,9 +13,15 @@ class Updater
      */
     private $collector;
 
-    public function __construct(Collector $collector)
+    /**
+     * @var string
+     */
+    private $dataDir;
+
+    public function __construct(Collector $collector, string $dataDir)
     {
         $this->collector = $collector;
+        $this->dataDir = $dataDir;
     }
 
     public function __invoke()
@@ -28,7 +34,7 @@ class Updater
 
         $updatedAt = new \DateTimeImmutable('now');
         foreach ($stationData as $station) {
-            $fh = Locking::getWritingLockOn(DATA_DIR."/{$station['id']}.dat");
+            $fh = Locking::getWritingLockOn("{$this->dataDir}/{$station['id']}.dat");
 
             fwrite($fh, "{$updatedAt->getTimestamp()},{$station['bikes']},{$station['slots']}\n");
 

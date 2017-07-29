@@ -28,7 +28,7 @@ class Collector
     }
 
     /**
-     * @return false|StationData[]
+     * @return false|array
      */
     public function __invoke()
     {
@@ -39,17 +39,6 @@ class Collector
             return false;
         }
 
-        $data = [];
-        $collectedAt = new \DateTimeImmutable('now');
-        foreach (json_decode((string)$res->getBody(), true) as $rawData) {
-            $data[] = new StationData(
-                (int)$rawData['id'],
-                (int)$rawData['bikes'],
-                (int)$rawData['slots'],
-                $collectedAt
-            );
-        }
-
-        return $data;
+        return json_decode((string)$res->getBody(), true);
     }
 }

@@ -22,14 +22,15 @@ class Updater
     {
         $collector = $this->collector;
 
-        if (false === $stations = $collector()) {
+        if (false === $stationData = $collector()) {
             return;
         }
 
-        foreach ($stations as $station) {
-            $fh = Locking::getWritingLockOn(DATA_DIR."/{$station->getId()}.dat");
+        $updatedAt = new \DateTimeImmutable('now');
+        foreach ($stationData as $station) {
+            $fh = Locking::getWritingLockOn(DATA_DIR."/{$station['id']}.dat");
 
-            fwrite($fh, (string)$station."\n");
+            fwrite($fh, "{$updatedAt->getTimestamp()},{$station['bikes']},{$station['slots']}\n");
 
             Locking::unlock($fh);
         }

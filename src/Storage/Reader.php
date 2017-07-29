@@ -6,20 +6,20 @@ namespace UMA\BicingStats\Storage;
 
 class Reader
 {
+    /**
+     * @param int $id
+     *
+     * @return bool|string
+     */
     public function __invoke(int $id)
     {
         if (false === $fh = Locking::getReadingLockOn(DATA_DIR . "/{$id}.dat")) {
             return false;
         }
 
-        $data = [];
-        while (false !== $line = fgets($fh)) {
-            list($timestamp, $bikes, $slots) = explode(',', trim($line));
+        $data = stream_get_contents($fh);
 
-            $data[$timestamp] = ['b' => (int)$bikes, 's' => (int)$slots];
-        }
-
-        Locking::scrap($fh);
+        Locking::unlock($fh);
 
         return $data;
     }

@@ -39,17 +39,17 @@ class Collector
             return false;
         }
 
-        $stations = [];
+        $data = [];
         $collectedAt = new \DateTimeImmutable('now');
-        foreach (json_decode((string)$res->getBody(), true) as $rawEntry) {
-            $stations[] = new StationData(
-                (int)$rawEntry['id'],
-                (int)$rawEntry['bikes'],
-                (int)$rawEntry['slots'],
+        foreach (json_decode((string)$res->getBody(), true) as $rawData) {
+            $data[] = new StationData(
+                (int)$rawData['id'],
+                (int)$rawData['bikes'],
+                (int)$rawData['slots'],
                 $collectedAt
             );
         }
 
-        return $stations;
+        return $data;
     }
 }

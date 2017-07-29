@@ -31,7 +31,7 @@ class Updater
 
             fwrite($fh, (string)$station."\n");
 
-            Locking::scrap($fh);
+            Locking::unlock($fh);
         }
     }
 }

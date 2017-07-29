@@ -39,7 +39,7 @@ class Locking
      *
      * @return bool
      */
-    public static function scrap($ptr)
+    public static function unlock($ptr)
     {
         if (!is_resource($ptr)) {
             return false;

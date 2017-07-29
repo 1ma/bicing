@@ -30,6 +30,8 @@ class StationAction
             return $response->withStatus(404);
         }
 
-        return $response->withJson($data);
+        $response->getBody()->write($data);
+
+        return $response->withHeader('Content-Type', 'text/csv');
     }
 }

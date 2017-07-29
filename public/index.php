@@ -3,8 +3,8 @@
 use Slim\App;
 use Slim\Container;
 use Slim\Views\Twig;
-use UMA\BicingStats\Http\StationAction;
-use UMA\BicingStats\Http\IndexAction;
+use UMA\BicingStats\Slim\StationAction;
+use UMA\BicingStats\Slim\IndexAction;
 use UMA\BicingStats\Storage\Reader;
 
 /** @var Container $cnt */

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\BicingStats\Http;
+namespace UMA\BicingStats\Slim;
 
 use Slim\Http\Request;
 use Slim\Http\Response;

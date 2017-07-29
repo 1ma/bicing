@@ -1,0 +1,5 @@
+/app/settings.php
+/docker-compose.yml
+/var/
+!/var/.gitkeep
+/vendor/

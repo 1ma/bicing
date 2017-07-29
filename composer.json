@@ -1,0 +1,23 @@
+{
+    "name": "uma/bicing-stats",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "guzzlehttp/guzzle": "6.3.0",
+        "slim/slim": "3.8.1",
+        "slim/twig-view": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "UMA\\BicingStats\\": "src/"
+        }
+    },
+    "scripts": {
+        "up": [
+            "@composer install --ignore-platform-reqs",
+            "cp -n res/infrastructure/settings.php.dist app/settings.php",
+            "cp -n res/infrastructure/docker-compose.yml.dist docker-compose.yml",
+            "docker-compose up -d"
+        ]
+    }
+}

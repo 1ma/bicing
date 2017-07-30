@@ -23,7 +23,7 @@ class Reader
      */
     public function __invoke(int $id)
     {
-        if (false === $fh = Locking::getReadingLockOn("{$this->dataDir}/{$id}.dat")) {
+        if (false === $fh = Locking::getReadingLockOn("{$this->dataDir}/{$id}.csv")) {
             return false;
         }
 

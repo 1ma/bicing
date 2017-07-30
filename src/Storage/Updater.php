@@ -34,7 +34,7 @@ class Updater
 
         $updatedAt = new \DateTimeImmutable('now');
         foreach ($stationData as $station) {
-            $fh = Locking::getWritingLockOn("{$this->dataDir}/{$station['id']}.dat");
+            $fh = Locking::getWritingLockOn("{$this->dataDir}/{$station['id']}.csv");
 
             fwrite($fh, "{$updatedAt->getTimestamp()},{$station['bikes']},{$station['slots']}\n");
 

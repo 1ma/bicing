@@ -1,5 +1,9 @@
 <?php
 
 return [
-    'displayErrorDetails' => true
+    'displayErrorDetails' => true,
+
+    'google' => [
+        'api_key' => ''
+    ]
 ];

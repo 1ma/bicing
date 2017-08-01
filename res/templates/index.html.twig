@@ -16,51 +16,67 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
 </head>
 <body>
-<h1>Ocupació Bicing</h1>
-<div id="kek" style="margin-left: 10%; margin-right: 10%"></div>
+<div id="container">
+    <h1>Ocupació Bicing</h1>
+    <div id="map" style="margin-left: 25%; margin-right: 25%; height: 400px;"></div>
+    <div id="graph" style="margin-left: 20%; margin-right: 20%"></div>
+</div>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ ga_key }}&callback=initMap"></script>
 <script>
+const bcn = {lat: 41.39805, lng: 2.180087 };
+
+function initMap() {
+    let map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13,
+        center: bcn
+    });
+
+    let marker = new google.maps.Marker({
+        position: bcn,
+        map: map
+    });
+}
+</script>
+<script>
+
 (function () {
     'use strict';
 
     function after(timestamp) {
-        return function (row) {
-            return timestamp < parseInt(row.timestamp);
-        }
+        return row => timestamp < parseInt(row.timestamp);
     }
 
-    function adapt(row) {
-        return {'date': new Date(row.timestamp*1000), 'value': parseInt(row.bikes)}
-    }
+    function derpo(limit, row) {
+        const localLimit = parseInt(row.bikes) + parseInt(row.slots);
 
-    function findBaseline(baseline, row) {
-        var localBaseline = parseInt(row.bikes) + parseInt(row.slots);
-
-        if (localBaseline > baseline) {
-            return localBaseline;
+        if (localLimit > limit) {
+            return localLimit;
         }
 
-        return baseline;
+        return limit;
     }
 
-    function print(data, derp, title, target) {
-        var cleanData = data
-            .filter(after(derp))
-            .map(adapt);
+    function print(data, oldestDate, title, target) {
+        const limit = data.reduce(derpo, 0);
+
+        const cleanData = data
+            .filter(after(oldestDate))
+            .map(row => ({date: new Date(row.timestamp*1000), value: parseInt(row.bikes)}));
 
         MG.data_graphic({
             title: title,
             data: cleanData,
             full_width: true,
-            height: 200,
+            height: 400,
             color: '#E3001B',
-            baselines: [{value: data.reduce(findBaseline, 0)}],
+            baselines: [{value: limit, label: `${limit} places`}],
             right: 4,
             target: target
         });
     }
 
     d3.csv('stations/123', function(data) {
-        print(data, moment().subtract(1, 'day').unix(), 'Estació 123', '#kek');
+        print(data, moment().subtract(1, 'day').unix(), 'Estació 123', '#graph');
     });
 })();
 </script>

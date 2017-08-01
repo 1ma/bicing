@@ -32,13 +32,26 @@ class Updater
             return;
         }
 
+        $mh = Locking::getWritingLockOn("{$this->dataDir}/meta.tsv", false);
+        fwrite($mh, "id\tlat\tlng\taddress\n");
+
         $updatedAt = new \DateTimeImmutable('now');
         foreach ($stationData as $station) {
-            $fh = Locking::getWritingLockOn("{$this->dataDir}/{$station['id']}.tsv");
+            $fullAddress = $station['address'];
+
+            if (isset($station['addressNumber'])) {
+                $fullAddress .= ", {$station['addressNumber']}";
+            }
+
+            fwrite($mh, "{$station['id']}\t{$station['lat']}\t{$station['lon']}\t$fullAddress\n");
+
+            $fh = Locking::getWritingLockOn("{$this->dataDir}/{$station['id']}.tsv", true);
 
             fwrite($fh, "{$updatedAt->getTimestamp()}\t{$station['bikes']}\t{$station['slots']}\n");
 
             Locking::unlock($fh);
         }
+
+        Locking::unlock($mh);
     }
 }

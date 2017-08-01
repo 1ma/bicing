@@ -8,12 +8,13 @@ class Locking
 {
     /**
      * @param string $file
+     * @param bool   $append
      *
      * @return resource
      */
-    public static function getWritingLockOn(string $file)
+    public static function getWritingLockOn(string $file, bool $append)
     {
-        flock($ptr = fopen($file, 'ab'), LOCK_EX);
+        flock($ptr = fopen($file, $append ? 'ab' : 'wb'), LOCK_EX);
 
         return $ptr;
     }

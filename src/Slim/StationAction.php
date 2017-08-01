@@ -32,6 +32,6 @@ class StationAction
 
         $response->getBody()->write($data);
 
-        return $response->withHeader('Content-Type', 'text/csv');
+        return $response->withHeader('Content-Type', 'text/tab-separated-values');
     }
 }

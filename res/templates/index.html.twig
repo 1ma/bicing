@@ -14,12 +14,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+
+    <style>
+        #map {
+            margin-left: 25%; margin-right: 25%; height: 400px;
+        }
+
+        #graph {
+            margin-left: 20%; margin-right: 20%;
+        }
+    </style>
 </head>
 <body>
 <div id="container">
     <h1>Ocupació Bicing</h1>
-    <div id="map" style="margin-left: 25%; margin-right: 25%; height: 400px;"></div>
-    <div id="graph" style="margin-left: 20%; margin-right: 20%"></div>
+    <div id="map"></div>
+    <div id="graph"></div>
 </div>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ ga_key }}&callback=initMap"></script>
 <script>
@@ -38,7 +48,6 @@ function initMap() {
 }
 </script>
 <script>
-
 (function () {
     'use strict';
 
@@ -75,7 +84,7 @@ function initMap() {
         });
     }
 
-    d3.csv('stations/123', function(data) {
+    d3.tsv('stations/123', function(data) {
         print(data, moment().subtract(1, 'day').unix(), 'Estació 123', '#graph');
     });
 })();

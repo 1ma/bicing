@@ -28,6 +28,6 @@ class IndexAction
 
     public function __invoke(Request $request, Response $response)
     {
-        return $this->twig->render($response, 'index.html.twig', ['ga_key' => $this->googleApiKey]);
+        return $this->twig->render($response, 'index.html.twig', ['google_key' => $this->googleApiKey]);
     }
 }

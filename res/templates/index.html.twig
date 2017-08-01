@@ -31,62 +31,58 @@
     <div id="map"></div>
     <div id="graph"></div>
 </div>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ ga_key }}&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_key }}&callback=initMap"></script>
 <script>
-let map = {};
+const BCN = {lat: 41.39805, lng: 2.180087 };
 
-const bcn = {lat: 41.39805, lng: 2.180087 };
+function inferCapacity(station) {
+    return station.reduce(function(capacity, dataPoint) {
+        const candidate = parseInt(dataPoint.bikes) + parseInt(dataPoint.slots);
 
-function after(timestamp) {
-    return row => timestamp < parseInt(row.timestamp);
+        if (candidate > capacity) {
+            return candidate;
+        }
+
+        return capacity;
+    }, 0);
 }
 
-function inferCapacity(capacity, row) {
-    const candidate = parseInt(row.bikes) + parseInt(row.slots);
+function printGraph(station, oldestDate, title, target) {
+    const capacity = inferCapacity(station);
 
-    if (candidate > capacity) {
-        return candidate;
-    }
-
-    return capacity;
-}
-
-function printGraph(data, oldestDate, title, target) {
-    const limit = data.reduce(inferCapacity, 0);
-
-    const cleanData = data
-        .filter(after(oldestDate))
-        .map(row => ({date: new Date(row.timestamp*1000), value: parseInt(row.bikes)}));
+    const parsedStationData = station
+        .filter(dataPoint => oldestDate < parseInt(dataPoint.timestamp))
+        .map(dataPoint => ({date: new Date(dataPoint.timestamp*1000), value: parseInt(dataPoint.bikes)}));
 
     MG.data_graphic({
         title: title,
-        data: cleanData,
+        data: parsedStationData,
         full_width: true,
         height: 400,
         color: '#E3001B',
-        baselines: [{value: limit, label: `capacitat: ${limit} places`}],
+        baselines: [{value: capacity, label: `capacitat: ${capacity} places`}],
         right: 4,
         target: target
     });
 }
 
 function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 14,
-        center: bcn
-    });
+    d3.tsv('stations', function(metaData) {
+        let map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 14,
+            center: BCN
+        });
 
-    d3.tsv('stations', function(data) {
-        data.forEach(function (row) {
+        metaData.forEach(function (station) {
             new google.maps.Marker({
                 map: map,
                 position: {
-                    lat: parseFloat(row.lat),
-                    lng: parseFloat(row.lng)
+                    lat: parseFloat(station.lat),
+                    lng: parseFloat(station.lng)
                 }
             }).addListener('click', function () {
-                d3.tsv(`stations/${row.id}`, function(data) {
-                    printGraph(data, moment().subtract(1, 'day').unix(), row.address, '#graph');
+                d3.tsv(`stations/${station.id}`, function(data) {
+                    printGraph(data, moment().subtract(1, 'day').unix(), station.address, '#graph');
                 });
             });
         });

@@ -1,1 +1,1 @@
-# Bicing stats
+# Bicing

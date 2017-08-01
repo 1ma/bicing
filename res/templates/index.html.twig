@@ -33,73 +33,65 @@
 </div>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ ga_key }}&callback=initMap"></script>
 <script>
-
-let stations = {};
+let map = {};
 
 const bcn = {lat: 41.39805, lng: 2.180087 };
 
-function initMap() {
-    let map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 13,
-        center: bcn
-    });
+function after(timestamp) {
+    return row => timestamp < parseInt(row.timestamp);
+}
 
-    let marker = new google.maps.Marker({
-        position: bcn,
-        map: map
+function inferCapacity(capacity, row) {
+    const candidate = parseInt(row.bikes) + parseInt(row.slots);
+
+    if (candidate > capacity) {
+        return candidate;
+    }
+
+    return capacity;
+}
+
+function printGraph(data, oldestDate, title, target) {
+    const limit = data.reduce(inferCapacity, 0);
+
+    const cleanData = data
+        .filter(after(oldestDate))
+        .map(row => ({date: new Date(row.timestamp*1000), value: parseInt(row.bikes)}));
+
+    MG.data_graphic({
+        title: title,
+        data: cleanData,
+        full_width: true,
+        height: 400,
+        color: '#E3001B',
+        baselines: [{value: limit, label: `capacitat: ${limit} places`}],
+        right: 4,
+        target: target
     });
 }
 
-(function () {
-    'use strict';
-
-    function after(timestamp) {
-        return row => timestamp < parseInt(row.timestamp);
-    }
-
-    function derpo(limit, row) {
-        const localLimit = parseInt(row.bikes) + parseInt(row.slots);
-
-        if (localLimit > limit) {
-            return localLimit;
-        }
-
-        return limit;
-    }
-
-    function print(data, oldestDate, title, target) {
-        const limit = data.reduce(derpo, 0);
-
-        const cleanData = data
-            .filter(after(oldestDate))
-            .map(row => ({date: new Date(row.timestamp*1000), value: parseInt(row.bikes)}));
-
-        MG.data_graphic({
-            title: title,
-            data: cleanData,
-            full_width: true,
-            height: 400,
-            color: '#E3001B',
-            baselines: [{value: limit, label: `${limit} places`}],
-            right: 4,
-            target: target
-        });
-    }
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: bcn
+    });
 
     d3.tsv('stations', function(data) {
         data.forEach(function (row) {
-            stations[row.id] = {
-                lat: row.lat,
-                lng: row.lng,
-                address: row.address,
-            };
-        });
-
-        d3.tsv(`stations/123`, function(data) {
-            print(data, moment().subtract(1, 'day').unix(), stations['123'].address, '#graph');
+            new google.maps.Marker({
+                map: map,
+                position: {
+                    lat: parseFloat(row.lat),
+                    lng: parseFloat(row.lng)
+                }
+            }).addListener('click', function () {
+                d3.tsv(`stations/${row.id}`, function(data) {
+                    printGraph(data, moment().subtract(1, 'day').unix(), row.address, '#graph');
+                });
+            });
         });
     });
-})();
+}
 </script>
 </body>
 </html>

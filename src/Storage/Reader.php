@@ -23,6 +23,10 @@ class Reader
      */
     public function __invoke(int $id)
     {
+        if (0 === $id) {
+            $id = 'meta';
+        }
+
         if (false === $fh = Locking::getReadingLockOn("{$this->dataDir}/{$id}.tsv")) {
             return false;
         }

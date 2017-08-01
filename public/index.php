@@ -25,9 +25,9 @@ $cnt[StationAction::class] = function ($cnt) {
 $cnt[App::class] = function ($cnt) {
     $app = new App($cnt);
 
-    $app->get(IndexAction::ROUTE, IndexAction::class);
-    $app->get(StationAction::ROUTE, StationAction::class);
-
+    $app->get('/', IndexAction::class);
+    $app->get('/stations', StationAction::class);
+    $app->get('/stations/{id:[0-9]{1,3}}', StationAction::class);
     return $app;
 };
 

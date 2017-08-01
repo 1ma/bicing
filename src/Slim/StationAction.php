@@ -10,8 +10,6 @@ use UMA\BicingStats\Storage\Reader;
 
 class StationAction
 {
-    const ROUTE = '/stations/{id:[0-9]{1,3}}';
-
     /**
      * @var Reader
      */
@@ -26,7 +24,7 @@ class StationAction
     {
         $reader = $this->reader;
 
-        if (false === $data = $reader((int)$args['id'])) {
+        if (false === $data = $reader((int)$args['id'] ?? 0)) {
             return $response->withStatus(404);
         }
 

@@ -13,56 +13,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
 </head>
 <body>
 <h1>Ocupació Bicing</h1>
-<div id="kek"></div>
-<div id="lol"></div>
+<div id="kek" style="margin-left: 10%; margin-right: 10%"></div>
 <script>
 (function () {
     'use strict';
 
+    function after(timestamp) {
+        return function (row) {
+            return timestamp < parseInt(row.timestamp);
+        }
+    }
+
+    function adapt(row) {
+        return {'date': new Date(row.timestamp*1000), 'value': parseInt(row.bikes)}
+    }
+
+    function findBaseline(baseline, row) {
+        var localBaseline = parseInt(row.bikes) + parseInt(row.slots);
+
+        if (localBaseline > baseline) {
+            return localBaseline;
+        }
+
+        return baseline;
+    }
+
+    function print(data, derp, title, target) {
+        var cleanData = data
+            .filter(after(derp))
+            .map(adapt);
+
+        MG.data_graphic({
+            title: title,
+            data: cleanData,
+            full_width: true,
+            height: 200,
+            color: '#E3001B',
+            baselines: [{value: data.reduce(findBaseline, 0)}],
+            right: 4,
+            target: target
+        });
+    }
+
     d3.csv('stations/123', function(data) {
-        var parsed = [];
-        data.forEach(function (t) {
-            parsed.push({"date": new Date(t.timestamp*1000), "value": t.bikes});
-        });
-
-        console.log(parsed);
-
-        MG.data_graphic({
-            title: "Estació 123",
-            data: parsed,
-            width: 600,
-            height: 200,
-            max_y: 16,
-            color: '#E3001B',
-            right: 4,
-            target: '#kek',
-            legend_target: '.legend'
-        });
-    });
-
-    d3.csv('stations/234', function(data) {
-        var parsed = [];
-        data.forEach(function (t) {
-            parsed.push({"date": new Date(t.timestamp*1000), "value": t.bikes});
-        });
-
-        console.log(parsed);
-
-        MG.data_graphic({
-            title: "Estació 234",
-            data: parsed,
-            width: 600,
-            height: 200,
-            max_y: 16,
-            right: 4,
-            color: '#E3001B',
-            missing_is_hidden: true,
-            target: '#lol',
-            legend_target: '.legend'
-        });
+        print(data, moment().subtract(1, 'day').unix(), 'Estació 123', '#kek');
     });
 })();
 </script>

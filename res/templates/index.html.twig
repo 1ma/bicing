@@ -21,7 +21,7 @@
         }
 
         #graph {
-            margin-left: 20%; margin-right: 20%;
+            margin-left: 20%; margin-right: 20%; margin-top: 3%;
         }
     </style>
 </head>
@@ -33,6 +33,9 @@
 </div>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ ga_key }}&callback=initMap"></script>
 <script>
+
+let stations = {};
+
 const bcn = {lat: 41.39805, lng: 2.180087 };
 
 function initMap() {
@@ -46,8 +49,7 @@ function initMap() {
         map: map
     });
 }
-</script>
-<script>
+
 (function () {
     'use strict';
 
@@ -84,8 +86,18 @@ function initMap() {
         });
     }
 
-    d3.tsv('stations/123', function(data) {
-        print(data, moment().subtract(1, 'day').unix(), 'Estació 123', '#graph');
+    d3.tsv('stations', function(data) {
+        data.forEach(function (row) {
+            stations[row.id] = {
+                lat: row.lat,
+                lng: row.lng,
+                address: row.address,
+            };
+        });
+
+        d3.tsv(`stations/123`, function(data) {
+            print(data, moment().subtract(1, 'day').unix(), stations['123'].address, '#graph');
+        });
     });
 })();
 </script>

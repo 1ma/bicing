@@ -84,7 +84,7 @@
                 d3.tsv(`stations/${station.id}`, function(data) {
                     const currentBikes = parseInt(data[data.length-1].bikes);
                     marker.bindPopup(`ara mateix: ${currentBikes} bicis`).openPopup();
-                    printGraph(data, moment().subtract(1, 'day').unix(), station.address, '#graph');
+                    printGraph(data, moment().subtract(1, 'week').unix(), station.address, '#graph');
                 });
             });
         });

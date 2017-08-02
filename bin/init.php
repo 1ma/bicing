@@ -1,15 +1,17 @@
 <?php
 
+use Slim\Container;
 use UMA\BicingStats\API\Collector;
 use UMA\BicingStats\Storage\Locking;
 
-require_once __DIR__ . '/../app/bootstrap.php';
+/** @var Container $cnt */
+$cnt = require_once __DIR__ . '/../app/modes/cli.php';
 
 @mkdir($cnt['paths.datastore']);
 
 touch("{$cnt['paths.datastore']}/meta.tsv");
 
-foreach (array_column((new Collector)(), 'id') as $id) {
+foreach (array_column($cnt[Collector::class](), 'id') as $id) {
     $fh = Locking::getWritingLockOn("{$cnt['paths.datastore']}/{$id}.tsv", true);
 
     if (0 === fstat($fh)['size']) {
@@ -18,5 +20,3 @@ foreach (array_column((new Collector)(), 'id') as $id) {
 
     Locking::unlock($fh);
 }
-
-require_once __DIR__ . '/collect.php';

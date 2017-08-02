@@ -1,10 +1,12 @@
 <?php
 
+use Slim\Container;
 use UMA\BicingStats\API\Collector;
 
-require_once __DIR__ . '/../app/bootstrap.php';
+/** @var Container $cnt */
+$cnt = require_once __DIR__ . '/../app/modes/cli.php';
 
-$rawData = (new Collector)();
+$rawData = $cnt[Collector::class]();
 
 echo implode("\t", array_keys($rawData[0])) . "\n";
 

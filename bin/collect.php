@@ -1,8 +1,9 @@
 <?php
 
+use Slim\Container;
 use UMA\BicingStats\Storage\Updater;
-use UMA\BicingStats\API\Collector;
 
-require_once __DIR__ . '/../app/bootstrap.php';
+/** @var Container $cnt */
+$cnt = require_once __DIR__ . '/../app/modes/cli.php';
 
-(new Updater(new Collector, $cnt['paths.datastore']))();
+$cnt[Updater::class]();

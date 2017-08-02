@@ -78,8 +78,12 @@
 
     d3.tsv('stations', function(metaData) {
         metaData.forEach(function (station) {
-            L.marker([parseFloat(station.lat), parseFloat(station.lng)]).addTo(map).on('click', function () {
+            const stationLocation = [parseFloat(station.lat), parseFloat(station.lng)];
+            let marker = L.marker(stationLocation).addTo(map).on('click', function () {
+                map.setView(stationLocation, 16);
                 d3.tsv(`stations/${station.id}`, function(data) {
+                    const currentBikes = parseInt(data[data.length-1].bikes);
+                    marker.bindPopup(`ara mateix: ${currentBikes} bicis`).openPopup();
                     printGraph(data, moment().subtract(1, 'day').unix(), station.address, '#graph');
                 });
             });

@@ -9,11 +9,13 @@
     <title>Ocupació Bicing</title>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.css" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/leaflet.css" rel="stylesheet" type="text/css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.1.0/leaflet.js"></script>
 
     <style>
         #map {
@@ -31,63 +33,58 @@
     <div id="map"></div>
     <div id="graph"></div>
 </div>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_key }}&callback=initMap"></script>
-<script>
-const BCN = {lat: 41.39805, lng: 2.180087 };
+<script defer>
+    const BCN = [41.3980, 2.180087];
 
-function inferCapacity(station) {
-    return station.reduce(function(capacity, dataPoint) {
-        const candidate = parseInt(dataPoint.bikes) + parseInt(dataPoint.slots);
-
-        if (candidate > capacity) {
-            return candidate;
-        }
-
-        return capacity;
-    }, 0);
-}
-
-function printGraph(station, oldestDate, title, target) {
-    const capacity = inferCapacity(station);
-
-    const parsedStationData = station
-        .filter(dataPoint => oldestDate < parseInt(dataPoint.timestamp))
-        .map(dataPoint => ({date: new Date(dataPoint.timestamp*1000), value: parseInt(dataPoint.bikes)}));
-
-    MG.data_graphic({
-        title: title,
-        data: parsedStationData,
-        full_width: true,
-        height: 400,
-        color: '#E3001B',
-        baselines: [{value: capacity, label: `capacitat: ${capacity} places`}],
-        right: 4,
-        target: target
+    let map = L.map('map', {
+        center: BCN,
+        zoom: 13
     });
-}
 
-function initMap() {
-    d3.tsv('stations', function(metaData) {
-        let map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 14,
-            center: BCN
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ osm_access_token }}',
+        {id: 'mapbox.streets'}
+    ).addTo(map);
+
+    function inferCapacity(station) {
+        return station.reduce(function(capacity, dataPoint) {
+            const candidate = parseInt(dataPoint.bikes) + parseInt(dataPoint.slots);
+
+            if (candidate > capacity) {
+                return candidate;
+            }
+
+            return capacity;
+        }, 0);
+    }
+
+    function printGraph(station, oldestDate, title, target) {
+        const capacity = inferCapacity(station);
+
+        const parsedStationData = station
+            .filter(dataPoint => oldestDate < parseInt(dataPoint.timestamp))
+            .map(dataPoint => ({date: new Date(dataPoint.timestamp*1000), value: parseInt(dataPoint.bikes)}));
+
+        MG.data_graphic({
+            title: title,
+            data: parsedStationData,
+            full_width: true,
+            height: 400,
+            color: '#E3001B',
+            baselines: [{value: capacity, label: `capacitat: ${capacity} places`}],
+            right: 4,
+            target: target
         });
+    }
 
+    d3.tsv('stations', function(metaData) {
         metaData.forEach(function (station) {
-            new google.maps.Marker({
-                map: map,
-                position: {
-                    lat: parseFloat(station.lat),
-                    lng: parseFloat(station.lng)
-                }
-            }).addListener('click', function () {
+            L.marker([parseFloat(station.lat), parseFloat(station.lng)]).addTo(map).on('click', function () {
                 d3.tsv(`stations/${station.id}`, function(data) {
                     printGraph(data, moment().subtract(1, 'day').unix(), station.address, '#graph');
                 });
             });
         });
     });
-}
 </script>
 </body>
 </html>

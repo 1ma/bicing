@@ -3,7 +3,7 @@
 return [
     'displayErrorDetails' => true,
 
-    'google' => [
-        'api_key' => ''
+    'osm' => [
+        'access_token' => ''
     ]
 ];

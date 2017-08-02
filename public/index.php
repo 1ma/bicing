@@ -15,7 +15,7 @@ $cnt[Twig::class] = function ($cnt) {
 };
 
 $cnt[IndexAction::class] = function ($cnt) {
-    return new IndexAction($cnt[Twig::class], $cnt['settings']['google']['api_key']);
+    return new IndexAction($cnt[Twig::class], $cnt['settings']['osm']['access_token']);
 };
 
 $cnt[StationAction::class] = function ($cnt) {

@@ -11,19 +11,19 @@ CREATE TABLE stations (
 );
 
 CREATE TABLE recent_observations (
-  observed_at TIMESTAMPTZ NOT NULL,
   station_id  SMALLINT    NOT NULL REFERENCES stations (id),
   bikes       SMALLINT    NULL,
   slots       SMALLINT    NULL,
+  observed_at TIMESTAMPTZ NOT NULL,
 
   PRIMARY KEY (station_id, observed_at)
 );
 
 CREATE TABLE historical_observations (
-  observed_at TIMESTAMPTZ NOT NULL,
   station_id  SMALLINT    NOT NULL,
   bikes       SMALLINT    NULL,
-  slots       SMALLINT    NULL
+  slots       SMALLINT    NULL,
+  observed_at TIMESTAMPTZ NOT NULL
 );
 
 -- data is accurate as of 2017-08-04

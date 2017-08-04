@@ -10,10 +10,10 @@ use UMA\BicingStats\Storage\Reader;
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../common.php';
 
-$cnt['paths.templates'] = $cnt['paths.root'] . '/res/templates';
+$cnt['paths']['templates'] = $cnt['paths']['root'] . '/res/templates';
 
 $cnt[Twig::class] = function ($cnt) {
-    return new Twig($cnt['paths.templates']);
+    return new Twig($cnt['paths']['templates']);
 };
 
 $cnt[IndexAction::class] = function ($cnt) {
@@ -21,7 +21,7 @@ $cnt[IndexAction::class] = function ($cnt) {
 };
 
 $cnt[StationAction::class] = function ($cnt) {
-    return new StationAction(new Reader($cnt['paths.datastore']));
+    return new StationAction(new Reader($cnt['paths']['datastore']));
 };
 
 $cnt[App::class] = function ($cnt) {

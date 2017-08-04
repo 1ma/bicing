@@ -1,0 +1,40 @@
+version: "2"
+services:
+  nginx:
+    image: nginx:1.13-alpine
+    ports:
+      - "443:443"
+    volumes:
+      - ./res/infrastructure/nginx/devel_ssl_crt:/etc/nginx/ssl/devel_ssl_crt
+      - ./res/infrastructure/nginx/devel_ssl_key:/etc/nginx/ssl/devel_ssl_key
+      - ./res/infrastructure/nginx/devel_vhost.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/var/www/bicing.local/public
+  fpm:
+    image: 1maa/php-fpm:7.1-xdebug
+    volumes:
+      - .:/var/www/bicing.local
+    working_dir: /var/www/bicing.local
+  collector:
+    image: 1maa/php-cli:7.1-xdebug
+    command: sh -c "php bin/init.php; while true; do php bin/collect.php; sleep 60; done"
+    volumes:
+      - .:/var/www/bicing.local
+    working_dir: /var/www/bicing.local
+  pgsql:
+    image: postgres:9.6-alpine
+    environment:
+      - POSTGRES_DB=bicing_devel
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "2345:5432"
+    volumes:
+      - ./res/infrastructure/postgres/schema.sql:/tmp/schema.sql
+  starter:
+    image: dadarek/wait-for-dependencies
+    command: nginx:443 fpm:9000 pgsql:5432
+    depends_on:
+      - collector
+      - fpm
+      - nginx
+      - pgsql

@@ -28,17 +28,17 @@ class Collector
     }
 
     /**
-     * @return false|array
+     * @return Response|false
      */
     public function __invoke()
     {
-        $req = new Request('GET', static::API_ENDPOINT);
-        $res = $this->http->send($req);
+        $request = new Request('GET', static::API_ENDPOINT);
+        $response = $this->http->send($request);
 
-        if (! $res instanceof Response || 200 !== $res->getStatusCode()) {
+        if (! $response instanceof Response || 200 !== $response->getStatusCode()) {
             return false;
         }
 
-        return json_decode((string)$res->getBody(), true);
+        return $response;
     }
 }

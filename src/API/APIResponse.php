@@ -49,8 +49,10 @@ class APIResponse implements \Countable, \Iterator
 
     /**
      * {@inheritdoc}
+     *
+     * @return DataPoint|null
      */
-    public function current(): ?DataPoint
+    public function current()
     {
         if (false === $current = current($this->dataPoints)) {
             return null;

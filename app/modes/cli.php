@@ -12,7 +12,7 @@ $cnt[Collector::class] = function () {
 };
 
 $cnt[Updater::class] = function ($cnt) {
-    return new Updater($cnt[Collector::class], $cnt['paths']['datastore']);
+    return new Updater($cnt[Collector::class], $cnt['paths.datastore']);
 };
 
 return $cnt;

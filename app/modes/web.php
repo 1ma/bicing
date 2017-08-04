@@ -17,7 +17,7 @@ $cnt[Twig::class] = function ($cnt) {
 };
 
 $cnt[IndexAction::class] = function ($cnt) {
-    return new IndexAction($cnt[Twig::class], $cnt['settings']['osm']['access_token']);
+    return new IndexAction($cnt[Twig::class], $cnt['settings']['openStreetMap']['accessToken']);
 };
 
 $cnt[StationAction::class] = function ($cnt) {

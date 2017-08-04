@@ -18,16 +18,16 @@ class IndexAction
     /**
      * @var string
      */
-    private $osmAccessToken;
+    private $accessToken;
 
     public function __construct(Twig $twig, string $accessToken)
     {
         $this->twig = $twig;
-        $this->osmAccessToken = $accessToken;
+        $this->accessToken = $accessToken;
     }
 
     public function __invoke(Request $request, Response $response)
     {
-        return $this->twig->render($response, 'index.html.twig', ['osm_access_token' => $this->osmAccessToken]);
+        return $this->twig->render($response, 'index.html.twig', ['osm_access_token' => $this->accessToken]);
     }
 }

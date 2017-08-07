@@ -26,8 +26,16 @@ CREATE TABLE historical_observations (
   observed_at TIMESTAMPTZ NOT NULL
 );
 
+CREATE TABLE stations_changelog (
+  station_id     SMALLINT    NOT NULL REFERENCES stations (id),
+  changed_column TEXT        NOT NULL,
+  old_value      TEXT        NULL,
+  new_value      TEXT        NOT NULL,
+  changed_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- data is accurate as of 2017-08-04
-INSERT INTO stations(id, is_open, type, lat, lng, address) VALUES
+INSERT INTO stations (id, is_open, type, lat, lng, address) VALUES
   (1, TRUE, 'regular', 41.397952, 2.180042, 'Gran Via Corts Catalanes, 760'),
   (2, TRUE, 'regular', 41.39553, 2.17706, 'Roger de Flor/ Gran Vía, 126'),
   (3, TRUE, 'regular', 41.393699, 2.181137, 'Ali Bei, 44'),
@@ -493,3 +501,40 @@ INSERT INTO stations(id, is_open, type, lat, lng, address) VALUES
   (494, TRUE, 'electric', 41.389481, 2.165357, 'RAMBLA CATALUNYA, 31'),
   (495, TRUE, 'electric', 41.377191, 2.149283, 'C/ DIPUTACIÓ - TARRAGONA, SN'),
   (496, TRUE, 'electric', 41.404871, 2.175141, 'C/ DE PROVENÇA, 445');
+
+CREATE FUNCTION changelog_trigger()
+  RETURNS TRIGGER AS $$
+BEGIN
+  IF TG_OP = 'UPDATE' AND OLD.is_open <> NEW.is_open
+  THEN
+    INSERT INTO stations_changelog (station_id, changed_column, old_value, new_value) VALUES
+      (NEW.id, 'is_open', OLD.is_open, NEW.is_open);
+  END IF;
+
+  IF TG_OP = 'UPDATE' AND OLD.type <> NEW.type
+  THEN
+    INSERT INTO stations_changelog (station_id, changed_column, old_value, new_value) VALUES
+      (NEW.id, 'type', OLD.type, NEW.type);
+  END IF;
+
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO stations_changelog (station_id, changed_column, old_value, new_value) VALUES
+      (NEW.id, 'id', NULL, NEW.id),
+      (NEW.id, 'is_open', NULL, NEW.is_open),
+      (NEW.id, 'lat', NULL, NEW.lat),
+      (NEW.id, 'lng', NULL, NEW.lng),
+      (NEW.id, 'address', NULL, NEW.address);
+  END IF;
+
+  RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER stations_au_trigger
+AFTER UPDATE ON stations
+FOR EACH ROW EXECUTE PROCEDURE changelog_trigger();
+
+CREATE TRIGGER stations_ai_trigger
+AFTER INSERT ON stations
+FOR EACH ROW EXECUTE PROCEDURE changelog_trigger();

@@ -2,6 +2,7 @@
 
 use Slim\Container;
 use UMA\BicingStats\API\Collector;
+use UMA\BicingStats\Postgres\Mapper;
 use UMA\BicingStats\Storage\Updater;
 
 /** @var Container $cnt */
@@ -14,7 +15,7 @@ $cnt[Collector::class] = function ($cnt) {
 };
 
 $cnt[Updater::class] = function ($cnt) {
-    return new Updater($cnt[Collector::class], $cnt['paths.datastore']);
+    return new Updater($cnt[Collector::class], $cnt[Mapper::class]);
 };
 
 return $cnt;

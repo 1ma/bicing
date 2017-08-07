@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace UMA\BicingStats\Storage;
 
 use UMA\BicingStats\API\Collector;
+use UMA\BicingStats\Postgres\Mapper;
 
 class Updater
 {
@@ -14,44 +15,24 @@ class Updater
     private $collector;
 
     /**
-     * @var string
+     * @var Mapper
      */
-    private $dataDir;
+    private $mapper;
 
-    public function __construct(Collector $collector, string $dataDir)
+    public function __construct(Collector $collector, Mapper $mapper)
     {
         $this->collector = $collector;
-        $this->dataDir = $dataDir;
+        $this->mapper = $mapper;
     }
 
-    public function __invoke()
+    public function __invoke(): bool
     {
         $collector = $this->collector;
 
         if (false === $stationData = $collector()) {
-            return;
+            return false;
         }
 
-        $mh = Locking::getWritingLockOn("{$this->dataDir}/meta.tsv", false);
-        fwrite($mh, "id\tlat\tlng\taddress\n");
-
-        $updatedAt = new \DateTimeImmutable('now');
-        foreach ($stationData as $station) {
-            $fullAddress = $station['address'];
-
-            if (isset($station['addressNumber'])) {
-                $fullAddress .= ", {$station['addressNumber']}";
-            }
-
-            fwrite($mh, "{$station['id']}\t{$station['lat']}\t{$station['lon']}\t$fullAddress\n");
-
-            $fh = Locking::getWritingLockOn("{$this->dataDir}/{$station['id']}.tsv", true);
-
-            fwrite($fh, "{$updatedAt->getTimestamp()}\t{$station['bikes']}\t{$station['slots']}\n");
-
-            Locking::unlock($fh);
-        }
-
-        Locking::unlock($mh);
+        return $this->mapper->appendObservation($stationData);
     }
 }

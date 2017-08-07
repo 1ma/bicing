@@ -5,40 +5,70 @@ declare(strict_types=1);
 namespace UMA\BicingStats\API;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use JsonSchema\Validator;
 
 class Collector
 {
     const API_ENDPOINT = 'https://www.bicing.cat/availability_map/getJsonObject';
 
     /**
+     * @var \stdClass
+     */
+    private $apiContract;
+
+    /**
      * @var Client
      */
     private $http;
 
-    public function __construct()
+    /**
+     * @var Validator
+     */
+    private $validator;
+
+    public function __construct(string $apiContractPath)
     {
+        $this->apiContract = (object)['$ref' => "file://$apiContractPath"];
         $this->http = new Client([
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::CONNECT_TIMEOUT => 5,
             RequestOptions::TIMEOUT => 5
         ]);
+        $this->validator = new Validator();
     }
 
     /**
-     * @return Response|false
+     * @return \stdClass[]|false
      */
     public function __invoke()
     {
-        $request = new Request('GET', static::API_ENDPOINT);
-        $response = $this->http->send($request);
-
-        if (! $response instanceof Response || 200 !== $response->getStatusCode()) {
+        try {
+            $response = $this->http->send(
+                new Request('GET', static::API_ENDPOINT)
+            );
+        } catch (TransferException $e) {
             return false;
         }
 
-        return $response;
+        if (200 !== $response->getStatusCode()) {
+            return false;
+        }
+
+        $decodedResponse = json_decode((string) $response->getBody());
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return false;
+        }
+
+        $this->validator->check($decodedResponse, $this->apiContract);
+
+        if (!$this->validator->isValid()) {
+            return false;
+        }
+
+        return $decodedResponse;
     }
 }

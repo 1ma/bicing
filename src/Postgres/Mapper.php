@@ -24,7 +24,7 @@ class Mapper
     public function appendObservation(array $observation): bool
     {
         $stmt = $this->rw->prepare(
-          'INSERT INTO recent_observations (station_id, bikes, slots, observed_at) VALUES '
+          'INSERT INTO observations (station_id, bikes, slots, observed_at) VALUES '
             . str_pad('', 10*count($observation) - 1, '(?,?,?,?),')
         );
 

@@ -10,7 +10,7 @@ CREATE TABLE stations (
   address TEXT          NOT NULL
 );
 
-CREATE TABLE recent_observations (
+CREATE TABLE observations (
   station_id  SMALLINT    NOT NULL REFERENCES stations (id),
   bikes       SMALLINT    NULL,
   slots       SMALLINT    NULL,
@@ -26,12 +26,11 @@ CREATE TABLE historical_observations (
   observed_at TIMESTAMPTZ NOT NULL
 );
 
-CREATE TABLE stations_changelog (
-  station_id     SMALLINT    NOT NULL REFERENCES stations (id),
-  changed_column TEXT        NOT NULL,
-  old_value      TEXT        NULL,
-  new_value      TEXT        NOT NULL,
-  changed_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE stations_audit (
+  station_id SMALLINT    NOT NULL REFERENCES stations (id),
+  old_data   TEXT        NULL,
+  new_data   TEXT        NOT NULL,
+  changed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- data is accurate as of 2017-08-04
@@ -502,29 +501,21 @@ INSERT INTO stations (id, is_open, type, lat, lng, address) VALUES
   (495, TRUE, 'electric', 41.377191, 2.149283, 'C/ DIPUTACIÓ - TARRAGONA, SN'),
   (496, TRUE, 'electric', 41.404871, 2.175141, 'C/ DE PROVENÇA, 445');
 
-CREATE FUNCTION changelog_trigger()
+CREATE FUNCTION update_stations_audit_table()
   RETURNS TRIGGER AS $$
+DECLARE
+  old_data TEXT;
 BEGIN
-  IF TG_OP = 'UPDATE' AND OLD.is_open <> NEW.is_open
-  THEN
-    INSERT INTO stations_changelog (station_id, changed_column, old_value, new_value) VALUES
-      (NEW.id, 'is_open', OLD.is_open, NEW.is_open);
-  END IF;
-
-  IF TG_OP = 'UPDATE' AND OLD.type <> NEW.type
-  THEN
-    INSERT INTO stations_changelog (station_id, changed_column, old_value, new_value) VALUES
-      (NEW.id, 'type', OLD.type, NEW.type);
-  END IF;
-
   IF TG_OP = 'INSERT' THEN
-    INSERT INTO stations_changelog (station_id, changed_column, old_value, new_value) VALUES
-      (NEW.id, 'id', NULL, NEW.id),
-      (NEW.id, 'is_open', NULL, NEW.is_open),
-      (NEW.id, 'lat', NULL, NEW.lat),
-      (NEW.id, 'lng', NULL, NEW.lng),
-      (NEW.id, 'address', NULL, NEW.address);
+    old_data = NULL;
+  ELSEIF TG_OP = 'UPDATE' THEN
+    old_data = ROW (OLD.*) :: TEXT;
+  ELSE
+    RAISE EXCEPTION 'This trigger only supports INSERT and UPDATE TG_OPs';
   END IF;
+
+  INSERT INTO stations_audit (station_id, old_data, new_data) VALUES
+    (NEW.id, old_data, ROW (NEW.*) :: TEXT);
 
   RETURN NEW;
 END;
@@ -533,8 +524,8 @@ LANGUAGE plpgsql;
 
 CREATE TRIGGER stations_au_trigger
 AFTER UPDATE ON stations
-FOR EACH ROW EXECUTE PROCEDURE changelog_trigger();
+FOR EACH ROW EXECUTE PROCEDURE update_stations_audit_table();
 
 CREATE TRIGGER stations_ai_trigger
 AFTER INSERT ON stations
-FOR EACH ROW EXECUTE PROCEDURE changelog_trigger();
+FOR EACH ROW EXECUTE PROCEDURE update_stations_audit_table();

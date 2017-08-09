@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\BicingStats\Storage;
+namespace UMA\BicingStats;
 
 use UMA\BicingStats\API\Collector;
 use UMA\BicingStats\Postgres\Gateway;

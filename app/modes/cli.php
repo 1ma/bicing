@@ -3,7 +3,7 @@
 use Slim\Container;
 use UMA\BicingStats\API\Collector;
 use UMA\BicingStats\Postgres\Gateway;
-use UMA\BicingStats\Storage\Updater;
+use UMA\BicingStats\Updater;
 
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../common.php';

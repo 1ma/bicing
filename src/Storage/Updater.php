@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace UMA\BicingStats\Storage;
 
 use UMA\BicingStats\API\Collector;
-use UMA\BicingStats\Postgres\Mapper;
+use UMA\BicingStats\Postgres\Gateway;
 
 class Updater
 {
@@ -15,14 +15,14 @@ class Updater
     private $collector;
 
     /**
-     * @var Mapper
+     * @var Gateway
      */
-    private $mapper;
+    private $gateway;
 
-    public function __construct(Collector $collector, Mapper $mapper)
+    public function __construct(Collector $collector, Gateway $gateway)
     {
         $this->collector = $collector;
-        $this->mapper = $mapper;
+        $this->gateway = $gateway;
     }
 
     public function __invoke(): bool
@@ -33,6 +33,6 @@ class Updater
             return false;
         }
 
-        return $this->mapper->appendObservation($stationData);
+        return $this->gateway->appendObservation($stationData);
     }
 }

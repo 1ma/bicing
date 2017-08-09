@@ -7,7 +7,7 @@ namespace UMA\BicingStats\Slim;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use UMA\BicingStats\Postgres\Mapper;
+use UMA\BicingStats\Postgres\Gateway;
 
 class StationController
 {
@@ -15,25 +15,25 @@ class StationController
     const ROUTE_STATION = '/stations/{id:[0-9]{1,3}}';
 
     /**
-     * @var Mapper
+     * @var Gateway
      */
-    private $mapper;
+    private $gateway;
 
-    public function __construct(Mapper $mapper)
+    public function __construct(Gateway $gateway)
     {
-        $this->mapper = $mapper;
+        $this->gateway = $gateway;
     }
 
     public function getMetaData(Request $request, Response $response)
     {
         return $response->withJson(
-            $this->mapper->getMetaData()
+            $this->gateway->getMetaData()
         );
     }
 
     public function getStationData(Request $request, Response $response, array $args)
     {
-        if ([] === $stationData = $this->mapper->getStationData((int) $args['id'])) {
+        if ([] === $stationData = $this->gateway->getStationData((int) $args['id'])) {
             throw new NotFoundException($request, $response);
         }
 

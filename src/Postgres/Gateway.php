@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UMA\BicingStats\Postgres;
 
-class Mapper
+class Gateway
 {
     /**
      * @var \PDO

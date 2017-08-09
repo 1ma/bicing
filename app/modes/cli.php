@@ -2,7 +2,7 @@
 
 use Slim\Container;
 use UMA\BicingStats\API\Collector;
-use UMA\BicingStats\Postgres\Mapper;
+use UMA\BicingStats\Postgres\Gateway;
 use UMA\BicingStats\Storage\Updater;
 
 /** @var Container $cnt */
@@ -15,7 +15,7 @@ $cnt[Collector::class] = function ($cnt) {
 };
 
 $cnt[Updater::class] = function ($cnt) {
-    return new Updater($cnt[Collector::class], $cnt[Mapper::class]);
+    return new Updater($cnt[Collector::class], $cnt[Gateway::class]);
 };
 
 return $cnt;

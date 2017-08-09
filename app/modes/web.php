@@ -3,10 +3,10 @@
 use Slim\App;
 use Slim\Container;
 use Slim\Views\Twig;
-use UMA\BicingStats\Postgres\Gateway;
-use UMA\BicingStats\Slim\SimpleHandler;
-use UMA\BicingStats\Slim\StationController;
-use UMA\BicingStats\Slim\IndexAction;
+use UMA\Bicing\Postgres\Gateway;
+use UMA\Bicing\Slim\SimpleHandler;
+use UMA\Bicing\Slim\StationController;
+use UMA\Bicing\Slim\IndexAction;
 
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../common.php';

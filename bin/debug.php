@@ -1,7 +1,7 @@
 <?php
 
 use Slim\Container;
-use UMA\BicingStats\API\Collector;
+use UMA\Bicing\API\Collector;
 
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../app/modes/cli.php';

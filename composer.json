@@ -10,7 +10,7 @@
     },
     "autoload": {
         "psr-4": {
-            "UMA\\BicingStats\\": "src/"
+            "UMA\\Bicing\\": "src/"
         }
     },
     "scripts": {

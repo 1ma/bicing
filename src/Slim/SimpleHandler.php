@@ -1,6 +1,6 @@
 <?php
 
-namespace UMA\BicingStats\Slim;
+namespace UMA\Bicing\Slim;
 
 use Slim\Http\Request;
 use Slim\Http\Response;

@@ -1,7 +1,7 @@
 <?php
 
 use Slim\Container;
-use UMA\BicingStats\Updater;
+use UMA\Bicing\Updater;
 
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../app/modes/cli.php';

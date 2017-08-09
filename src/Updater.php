@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace UMA\BicingStats;
+namespace UMA\Bicing;
 
-use UMA\BicingStats\API\Collector;
-use UMA\BicingStats\Postgres\Gateway;
+use UMA\Bicing\API\Collector;
+use UMA\Bicing\Postgres\Gateway;
 
 class Updater
 {

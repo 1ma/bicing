@@ -1,6 +1,6 @@
 <?php
 
-use UMA\BicingStats\Postgres\Gateway;
+use UMA\Bicing\Postgres\Gateway;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 

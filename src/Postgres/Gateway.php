@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\BicingStats\Postgres;
+namespace UMA\Bicing\Postgres;
 
 class Gateway
 {

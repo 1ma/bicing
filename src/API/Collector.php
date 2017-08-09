@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UMA\BicingStats\API;
+namespace UMA\Bicing\API;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;

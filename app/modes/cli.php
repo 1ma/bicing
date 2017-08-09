@@ -1,9 +1,9 @@
 <?php
 
 use Slim\Container;
-use UMA\BicingStats\API\Collector;
-use UMA\BicingStats\Postgres\Gateway;
-use UMA\BicingStats\Updater;
+use UMA\Bicing\API\Collector;
+use UMA\Bicing\Postgres\Gateway;
+use UMA\Bicing\Updater;
 
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../common.php';

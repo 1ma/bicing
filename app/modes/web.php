@@ -3,9 +3,9 @@
 use Slim\App;
 use Slim\Container;
 use Slim\Views\Twig;
+use UMA\BicingStats\Postgres\Mapper;
 use UMA\BicingStats\Slim\StationAction;
 use UMA\BicingStats\Slim\IndexAction;
-use UMA\BicingStats\Storage\Reader;
 
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../common.php';
@@ -21,15 +21,15 @@ $cnt[IndexAction::class] = function ($cnt) {
 };
 
 $cnt[StationAction::class] = function ($cnt) {
-    return new StationAction(new Reader($cnt['paths.datastore']));
+    return new StationAction($cnt[Mapper::class]);
 };
 
 $cnt[App::class] = function ($cnt) {
     $app = new App($cnt);
 
     $app->get('/', IndexAction::class);
-    $app->get('/stations', StationAction::class);
-    $app->get('/stations/{id:[0-9]{1,3}}', StationAction::class);
+    $app->get('/stations', StationAction::class . ':getMetaData');
+    $app->get('/stations/{id:[0-9]{1,3}}', StationAction::class . ':getStationData');
 
     return $app;
 };

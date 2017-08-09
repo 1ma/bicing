@@ -39,4 +39,33 @@ class Mapper
 
         return $stmt->execute($params);
     }
+
+    public function getStationData(int $stationId): array
+    {
+        $stmt = $this->rw->prepare('
+          SELECT
+            bikes,
+            slots,
+            extract(EPOCH FROM observed_at) as date
+          FROM observations
+          WHERE station_id = :id
+          ORDER BY observed_at ASC
+        ');
+
+        $stmt->execute(['id' => $stationId]);
+
+        return $stmt->fetchAll();
+    }
+
+    public function getMetaData(): array
+    {
+        $stmt = $this->rw->query('
+          SELECT id, type, lat, lng, address
+          FROM stations
+          WHERE is_open IS TRUE
+          ORDER BY id ASC
+        ');
+
+        return $stmt->fetchAll();
+    }
 }

@@ -6,30 +6,31 @@ namespace UMA\BicingStats\Slim;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
-use UMA\BicingStats\Storage\Reader;
+use UMA\BicingStats\Postgres\Mapper;
 
 class StationAction
 {
     /**
-     * @var Reader
+     * @var Mapper
      */
-    private $reader;
+    private $mapper;
 
-    public function __construct(Reader $reader)
+    public function __construct(Mapper $mapper)
     {
-        $this->reader = $reader;
+        $this->mapper = $mapper;
     }
 
-    public function __invoke(Request $request, Response $response, array $args)
+    public function getStationData(Request $request, Response $response, array $args)
     {
-        $reader = $this->reader;
+        return $response->withJson(
+            $this->mapper->getStationData((int) $args['id'])
+        );
+    }
 
-        if (false === $data = $reader((int)$args['id'] ?? 0)) {
-            return $response->withStatus(404);
-        }
-
-        $response->getBody()->write($data);
-
-        return $response->withHeader('Content-Type', 'text/tab-separated-values');
+    public function getMetaData(Request $request, Response $response, array $args)
+    {
+        return $response->withJson(
+            $this->mapper->getMetaData()
+        );
     }
 }

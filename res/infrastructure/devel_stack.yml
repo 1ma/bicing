@@ -2,6 +2,8 @@ version: "2"
 services:
   nginx:
     image: nginx:1.13-alpine
+    depends_on:
+      - fpm
     ports:
       - "443:443"
     volumes:
@@ -11,12 +13,16 @@ services:
       - ./public:/var/www/bicing.local/public
   fpm:
     image: 1maa/php-fpm:7.1-xdebug
+    ports:
+      - "2222:22"
     volumes:
       - .:/var/www/bicing.local
     working_dir: /var/www/bicing.local
   collector:
     image: 1maa/php-cli:7.1-xdebug
     command: sh -c "while true; do php bin/collect.php; sleep 60; done"
+    depends_on:
+      - pgsql
     volumes:
       - .:/var/www/bicing.local
     working_dir: /var/www/bicing.local
@@ -32,7 +38,7 @@ services:
       - ./res/infrastructure/postgres/schema.sql:/tmp/schema.sql
   starter:
     image: dadarek/wait-for-dependencies
-    command: nginx:443 fpm:9000 pgsql:5432
+    command: pgsql:5432 fpm:9000 nginx:443
     depends_on:
       - collector
       - fpm

@@ -16,7 +16,7 @@ services:
     working_dir: /var/www/bicing.local
   collector:
     image: 1maa/php-cli:7.1-xdebug
-    command: sh -c "php bin/init.php; while true; do php bin/collect.php; sleep 60; done"
+    command: sh -c "while true; do php bin/collect.php; sleep 60; done"
     volumes:
       - .:/var/www/bicing.local
     working_dir: /var/www/bicing.local

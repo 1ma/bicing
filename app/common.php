@@ -11,7 +11,6 @@ date_default_timezone_set(BCN_TIMEZONE);
 $cnt = new \Slim\Container(['settings' => require_once __DIR__ . '/settings.php']);
 
 $cnt['paths.root'] = realpath(__DIR__ . '/..');
-$cnt['paths.datastore'] = $cnt['paths.root'] . '/var/data';
 
 $cnt[\PDO::class] = function ($cnt) {
     $pdo = new \PDO($cnt['settings']['pdo']['dsn'], null, null, [

@@ -4,7 +4,8 @@ use Slim\App;
 use Slim\Container;
 use Slim\Views\Twig;
 use UMA\BicingStats\Postgres\Mapper;
-use UMA\BicingStats\Slim\StationAction;
+use UMA\BicingStats\Slim\SimpleHandler;
+use UMA\BicingStats\Slim\StationController;
 use UMA\BicingStats\Slim\IndexAction;
 
 /** @var Container $cnt */
@@ -20,16 +21,28 @@ $cnt[IndexAction::class] = function ($cnt) {
     return new IndexAction($cnt[Twig::class], $cnt['settings']['openStreetMap']['accessToken']);
 };
 
-$cnt[StationAction::class] = function ($cnt) {
-    return new StationAction($cnt[Mapper::class]);
+$cnt[StationController::class] = function ($cnt) {
+    return new StationController($cnt[Mapper::class]);
+};
+
+$cnt['notFoundHandler'] = function () {
+    return new SimpleHandler(404);
+};
+
+$cnt['notAllowedHandler'] = function () {
+    return new SimpleHandler(405);
+};
+
+$cnt['errorHandler'] = function () {
+    return new SimpleHandler(500);
 };
 
 $cnt[App::class] = function ($cnt) {
     $app = new App($cnt);
 
-    $app->get('/', IndexAction::class);
-    $app->get('/stations', StationAction::class . ':getMetaData');
-    $app->get('/stations/{id:[0-9]{1,3}}', StationAction::class . ':getStationData');
+    $app->get(IndexAction::ROUTE, IndexAction::class);
+    $app->get(StationController::ROUTE_META, StationController::class . ':getMetaData');
+    $app->get(StationController::ROUTE_STATION, StationController::class . ':getStationData');
 
     return $app;
 };

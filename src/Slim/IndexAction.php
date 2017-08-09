@@ -10,6 +10,8 @@ use Slim\Views\Twig;
 
 class IndexAction
 {
+    const ROUTE = '/';
+
     /**
      * @var Twig
      */

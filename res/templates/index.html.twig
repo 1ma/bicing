@@ -61,8 +61,8 @@
         const capacity = inferCapacity(station);
 
         const parsedStationData = station
-            .filter(dataPoint => oldestDate < parseInt(dataPoint.timestamp))
-            .map(dataPoint => ({date: new Date(dataPoint.timestamp*1000), value: parseInt(dataPoint.bikes)}));
+            .filter(dataPoint => oldestDate < parseInt(dataPoint.date))
+            .map(dataPoint => ({date: new Date(dataPoint.date*1000), value: parseInt(dataPoint.bikes)}));
 
         MG.data_graphic({
             title: title,
@@ -76,12 +76,12 @@
         });
     }
 
-    d3.tsv('stations', function(metaData) {
+    d3.json('stations', function(metaData) {
         metaData.forEach(function (station) {
             const stationLocation = [parseFloat(station.lat), parseFloat(station.lng)];
             let marker = L.marker(stationLocation).addTo(map).on('click', function () {
                 map.setView(stationLocation, 16);
-                d3.tsv(`stations/${station.id}`, function(data) {
+                d3.json(`stations/${station.id}`, function(data) {
                     const currentBikes = parseInt(data[data.length-1].bikes);
                     marker.bindPopup(`ara mateix: ${currentBikes} bicis`).openPopup();
                     printGraph(data, moment().subtract(1, 'week').unix(), station.address, '#graph');

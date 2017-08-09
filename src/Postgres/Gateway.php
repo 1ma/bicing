@@ -68,4 +68,21 @@ class Gateway
 
         return $stmt->fetchAll();
     }
+
+    public function archiveOldObservations(\DateTimeImmutable $threshold): int
+    {
+        $stmt = $this->rw->prepare('
+          WITH olden AS (
+            DELETE FROM observations
+            WHERE observed_at < :threshold
+
+            RETURNING *
+          ) INSERT INTO historical_observations
+              SELECT * FROM olden;
+        ');
+
+        $stmt->execute(['threshold' => $threshold->format(\DateTime::ATOM)]);
+
+        return $stmt->rowCount();
+    }
 }

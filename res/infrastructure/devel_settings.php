@@ -14,5 +14,9 @@ return [
 
     'openStreetMap' => [
         'accessToken' => ''
+    ],
+
+    'archival' => [
+        'secondsOld' => 3600
     ]
 ];

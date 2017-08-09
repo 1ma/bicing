@@ -7,7 +7,6 @@ namespace UMA\Bicing\API;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
 use JsonSchema\Validator;
 
 class Collector
@@ -29,14 +28,10 @@ class Collector
      */
     private $validator;
 
-    public function __construct(string $apiContractPath)
+    public function __construct(Client $http, string $apiContractPath)
     {
+        $this->http = $http;
         $this->apiContract = (object)['$ref' => "file://$apiContractPath"];
-        $this->http = new Client([
-            RequestOptions::HTTP_ERRORS => false,
-            RequestOptions::CONNECT_TIMEOUT => 5,
-            RequestOptions::TIMEOUT => 5
-        ]);
         $this->validator = new Validator();
     }
 

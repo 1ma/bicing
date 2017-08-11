@@ -17,8 +17,9 @@
         }
     },
     "scripts": {
-        "up": [
+        "devel-setup": [
             "@composer install --ignore-platform-reqs",
+            "cp -n res/infrastructure/devel_pre-commit.sh .git/hooks/pre-commit",
             "cp -n res/infrastructure/devel_settings.php app/settings.php",
             "cp -n res/infrastructure/devel_stack.yml docker-compose.yml",
             "docker-compose run --rm starter",

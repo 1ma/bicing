@@ -32,11 +32,11 @@
       },
       "status": {
         "type": "string",
-        "pattern": "^OPN|CLS$"
+        "enum": ["OPN", "CLS"]
       },
       "stationType": {
         "type": "string",
-        "pattern": "^(?:ELECTRIC_)?BIKE$"
+        "enum": ["BIKE", "ELECTRIC_BIKE"]
       }
     },
     "required": [

@@ -30,9 +30,9 @@ class Updater
         $collector = $this->collector;
 
         if (false === $stationData = $collector()) {
-            return false;
+            return $this->gateway->recordFailedObservation();
         }
 
-        return $this->gateway->appendObservation($stationData);
+        return $this->gateway->recordObservation($stationData);
     }
 }

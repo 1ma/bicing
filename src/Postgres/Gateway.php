@@ -21,7 +21,7 @@ class Gateway
      *
      * @return bool
      */
-    public function appendObservation(array $observation): bool
+    public function recordObservation(array $observation): bool
     {
         $stmt = $this->rw->prepare(
           'INSERT INTO observations (station_id, bikes, slots, observed_at) VALUES '
@@ -29,15 +29,32 @@ class Gateway
         );
 
         $params = [];
-        $observedAt = (new \DateTimeImmutable)->format(\DateTime::ATOM);
+        $now = (new \DateTimeImmutable)->format(\DateTime::ATOM);
         foreach ($observation as $station) {
             $params[] = $station->id;
             $params[] = $station->bikes;
             $params[] = $station->slots;
-            $params[] = $observedAt;
+            $params[] = $now;
         }
 
         return $stmt->execute($params);
+    }
+
+    public function recordFailedObservation(): bool
+    {
+        $now = (new \DateTimeImmutable)->format(\DateTime::ATOM);
+
+        $stmt = $this->rw->prepare('
+          INSERT INTO observations (station_id, bikes, slots, observed_at)
+            SELECT
+              id AS station_id,
+              NULL AS bikes,
+              NULL AS slots,
+              :now AS observed_at
+            FROM stations
+        ');
+
+        return $stmt->execute(['now' => $now]);
     }
 
     public function getStationData(int $stationId): array

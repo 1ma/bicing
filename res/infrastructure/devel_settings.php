@@ -17,6 +17,6 @@ return [
     ],
 
     'archival' => [
-        'secondsOld' => 3600
+        'secondsOld' => 3600    // 90*24*60*60 // 90 days
     ]
 ];

@@ -30,7 +30,7 @@ CREATE TABLE stations_audit (
   station_id SMALLINT    NOT NULL REFERENCES stations (id),
   old_data   TEXT        NULL,
   new_data   TEXT        NOT NULL,
-  changed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  changed_at TIMESTAMPTZ NOT NULL
 );
 
 -- data is accurate as of 2017-08-04
@@ -501,10 +501,11 @@ INSERT INTO stations (id, is_open, type, lat, lng, address) VALUES
   (495, TRUE, 'electric', 41.377191, 2.149283, 'C/ DIPUTACIÓ - TARRAGONA, SN'),
   (496, TRUE, 'electric', 41.404871, 2.175141, 'C/ DE PROVENÇA, 445');
 
-CREATE FUNCTION update_stations_audit_table()
+CREATE FUNCTION fill_stations_audit()
   RETURNS TRIGGER AS $$
 DECLARE
   old_data TEXT;
+  new_data TEXT;
 BEGIN
   IF TG_OP = 'INSERT' THEN
     old_data = NULL;
@@ -514,8 +515,10 @@ BEGIN
     RAISE EXCEPTION 'This trigger only supports INSERT and UPDATE TG_OPs';
   END IF;
 
-  INSERT INTO stations_audit (station_id, old_data, new_data) VALUES
-    (NEW.id, old_data, ROW (NEW.*) :: TEXT);
+  new_data = ROW (NEW.*) :: TEXT;
+
+  INSERT INTO stations_audit (station_id, old_data, new_data, changed_at) VALUES
+    (NEW.id, old_data, new_data, NOW());
 
   RETURN NEW;
 END;
@@ -524,8 +527,8 @@ LANGUAGE plpgsql;
 
 CREATE TRIGGER stations_au_trigger
 AFTER UPDATE ON stations
-FOR EACH ROW EXECUTE PROCEDURE update_stations_audit_table();
+FOR EACH ROW EXECUTE PROCEDURE fill_stations_audit();
 
 CREATE TRIGGER stations_ai_trigger
 AFTER INSERT ON stations
-FOR EACH ROW EXECUTE PROCEDURE update_stations_audit_table();
+FOR EACH ROW EXECUTE PROCEDURE fill_stations_audit();

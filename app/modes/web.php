@@ -5,7 +5,7 @@ use Slim\Container;
 use Slim\Views\Twig;
 use UMA\Bicing\Postgres\ObservationMapper;
 use UMA\Bicing\Postgres\StationMapper;
-use UMA\Bicing\Slim\SimpleHandler;
+use UMA\Bicing\Slim\SimpleHttpExceptionHandler;
 use UMA\Bicing\Slim\StationController;
 use UMA\Bicing\Slim\IndexAction;
 
@@ -27,15 +27,15 @@ $cnt[StationController::class] = function ($cnt) {
 };
 
 $cnt['notFoundHandler'] = function () {
-    return new SimpleHandler(404);
+    return new SimpleHttpExceptionHandler(404);
 };
 
 $cnt['notAllowedHandler'] = function () {
-    return new SimpleHandler(405);
+    return new SimpleHttpExceptionHandler(405);
 };
 
 $cnt['errorHandler'] = function () {
-    return new SimpleHandler(500);
+    return new SimpleHttpExceptionHandler(500);
 };
 
 $cnt[App::class] = function ($cnt) {

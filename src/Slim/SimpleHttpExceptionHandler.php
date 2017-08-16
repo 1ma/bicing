@@ -5,7 +5,7 @@ namespace UMA\Bicing\Slim;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class SimpleHandler
+class SimpleHttpExceptionHandler
 {
     /**
      * @var int

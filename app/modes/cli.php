@@ -34,7 +34,7 @@ $cnt[Updater::class] = function ($cnt) {
 };
 
 $cnt[ConsoleExceptionHandler::class] = function ($cnt) {
-    return new ConsoleExceptionHandler($cnt[LoggerInterface::class]);
+    return new ConsoleExceptionHandler($cnt[LoggerInterface::class], $cnt[PDO::class]);
 };
 
 set_exception_handler($cnt[ConsoleExceptionHandler::class]);

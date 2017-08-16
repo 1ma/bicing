@@ -4,7 +4,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Slim\Container;
 use UMA\Bicing\API\Collector;
-use UMA\Bicing\Postgres\Gateway;
+use UMA\Bicing\Postgres\ObservationMapper;
 use UMA\Bicing\Updater;
 
 /** @var Container $cnt */
@@ -28,7 +28,7 @@ $cnt[Collector::class] = function ($cnt) {
 };
 
 $cnt[Updater::class] = function ($cnt) {
-    return new Updater($cnt[Collector::class], $cnt[Gateway::class]);
+    return new Updater($cnt[Collector::class], $cnt[ObservationMapper::class]);
 };
 
 return $cnt;

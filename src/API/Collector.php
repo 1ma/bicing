@@ -6,8 +6,8 @@ namespace UMA\Bicing\API;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Psr7\Request;
 use JsonSchema\Validator;
+use UMA\Bicing\Model\Observation;
 
 class Collector
 {
@@ -23,47 +23,37 @@ class Collector
      */
     private $http;
 
-    /**
-     * @var Validator
-     */
-    private $validator;
-
     public function __construct(Client $http, string $apiContractPath)
     {
         $this->http = $http;
         $this->apiContract = (object)['$ref' => "file://$apiContractPath"];
-        $this->validator = new Validator();
     }
 
-    /**
-     * @return \stdClass[]|false
-     */
-    public function __invoke()
+    public function __invoke(): ?Observation
     {
         try {
-            $response = $this->http->send(
-                new Request('GET', static::API_ENDPOINT)
-            );
+            $response = $this->http->get(static::API_ENDPOINT);
         } catch (TransferException $e) {
-            return false;
+            return null;
         }
 
         if (200 !== $response->getStatusCode()) {
-            return false;
+            return null;
         }
 
         $decodedResponse = json_decode((string) $response->getBody());
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            return false;
+            return null;
         }
 
-        $this->validator->check($decodedResponse, $this->apiContract);
+        $validator = new Validator();
+        $validator->check($decodedResponse, $this->apiContract);
 
-        if (!$this->validator->isValid()) {
-            return false;
+        if (!$validator->isValid()) {
+            return null;
         }
 
-        return $decodedResponse;
+        return new Observation($decodedResponse);
     }
 }

@@ -3,7 +3,8 @@
 use Slim\App;
 use Slim\Container;
 use Slim\Views\Twig;
-use UMA\Bicing\Postgres\Gateway;
+use UMA\Bicing\Postgres\ObservationMapper;
+use UMA\Bicing\Postgres\StationMapper;
 use UMA\Bicing\Slim\SimpleHandler;
 use UMA\Bicing\Slim\StationController;
 use UMA\Bicing\Slim\IndexAction;
@@ -22,7 +23,7 @@ $cnt[IndexAction::class] = function ($cnt) {
 };
 
 $cnt[StationController::class] = function ($cnt) {
-    return new StationController($cnt[Gateway::class]);
+    return new StationController($cnt[StationMapper::class], $cnt[ObservationMapper::class]);
 };
 
 $cnt['notFoundHandler'] = function () {

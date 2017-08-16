@@ -1,6 +1,7 @@
 <?php
 
-use UMA\Bicing\Postgres\Gateway;
+use UMA\Bicing\Postgres\ObservationMapper;
+use UMA\Bicing\Postgres\StationMapper;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -24,8 +25,12 @@ $cnt[\PDO::class] = function ($cnt) {
     return $pdo;
 };
 
-$cnt[Gateway::class] = function ($cnt) {
-    return new Gateway($cnt[\PDO::class]);
+$cnt[StationMapper::class] = function ($cnt) {
+    return new StationMapper($cnt[\PDO::class]);
+};
+
+$cnt[ObservationMapper::class] = function ($cnt) {
+    return new ObservationMapper($cnt[\PDO::class], $cnt[StationMapper::class]);
 };
 
 return $cnt;

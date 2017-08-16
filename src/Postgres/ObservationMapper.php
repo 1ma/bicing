@@ -4,37 +4,47 @@ declare(strict_types=1);
 
 namespace UMA\Bicing\Postgres;
 
-class Gateway
+use UMA\Bicing\Model\Observation;
+
+class ObservationMapper
 {
     /**
      * @var \PDO
      */
     private $rw;
 
-    public function __construct(\PDO $rw)
+    /**
+     * @var StationMapper
+     */
+    private $stationMapper;
+
+    public function __construct(\PDO $rw, StationMapper $stationMapper)
     {
         $this->rw = $rw;
+        $this->stationMapper = $stationMapper;
     }
 
-    /**
-     * @param \stdClass[] $observation
-     *
-     * @return bool
-     */
-    public function recordObservation(array $observation): bool
+    public function recordObservation(Observation $observation): bool
     {
         $stmt = $this->rw->prepare(
-          'INSERT INTO observations (station_id, bikes, slots, observed_at) VALUES '
+            'INSERT INTO observations (station_id, bikes, slots, observed_at) VALUES '
             . str_pad('', 10*count($observation) - 1, '(?,?,?,?),')
         );
 
         $params = [];
-        $now = (new \DateTimeImmutable)->format(\DateTime::ATOM);
-        foreach ($observation as $station) {
-            $params[] = $station->id;
-            $params[] = $station->bikes;
-            $params[] = $station->slots;
-            $params[] = $now;
+        $observationDate = $observation->observedAt()->format(\DateTime::ATOM);
+        $currentStations = $this->stationMapper->getCurrentStations();
+        foreach ($observation as $occupancyLevel) {
+            $station = $occupancyLevel->getStation();
+
+            if (!isset($currentStations[$station->getId()]) || $station != $currentStations[$station->getId()]) {
+                $this->stationMapper->save($station);
+            }
+
+            $params[] = $station->getId();
+            $params[] = $occupancyLevel->parkedBikes();
+            $params[] = $occupancyLevel->freeSlots();
+            $params[] = $observationDate;
         }
 
         return $stmt->execute($params);
@@ -69,19 +79,9 @@ class Gateway
           ORDER BY observed_at ASC
         ');
 
-        $stmt->execute(['id' => $stationId]);
+        $stmt->bindValue('id', $stationId, \PDO::PARAM_INT);
 
-        return $stmt->fetchAll();
-    }
-
-    public function getMetaData(): array
-    {
-        $stmt = $this->rw->query('
-          SELECT id, type, lat, lng, address
-          FROM stations
-          WHERE is_open IS TRUE
-          ORDER BY id ASC
-        ');
+        $stmt->execute();
 
         return $stmt->fetchAll();
     }

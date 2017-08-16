@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace UMA\Bicing;
 
 use UMA\Bicing\API\Collector;
-use UMA\Bicing\Postgres\Gateway;
+use UMA\Bicing\Postgres\ObservationMapper;
 
 class Updater
 {
@@ -15,24 +15,24 @@ class Updater
     private $collector;
 
     /**
-     * @var Gateway
+     * @var ObservationMapper
      */
-    private $gateway;
+    private $mapper;
 
-    public function __construct(Collector $collector, Gateway $gateway)
+    public function __construct(Collector $collector, ObservationMapper $mapper)
     {
         $this->collector = $collector;
-        $this->gateway = $gateway;
+        $this->mapper = $mapper;
     }
 
     public function __invoke(): bool
     {
         $collector = $this->collector;
 
-        if (false === $stationData = $collector()) {
-            return $this->gateway->recordFailedObservation();
+        if (null === $observation = $collector()) {
+            return $this->mapper->recordFailedObservation();
         }
 
-        return $this->gateway->recordObservation($stationData);
+        return $this->mapper->recordObservation($observation);
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use UMA\Bicing\Postgres\ObservationMapper;
 use UMA\Bicing\Postgres\StationMapper;
 
@@ -23,6 +26,13 @@ $cnt[\PDO::class] = function ($cnt) {
     $pdo->exec(sprintf("SET TIMEZONE TO '%s'", BCN_TIMEZONE));
 
     return $pdo;
+};
+
+$cnt[LoggerInterface::class] = function () {
+    $logger = new Logger('bicing');
+    $logger->pushHandler(new StreamHandler('php://stdout'));
+
+    return $logger;
 };
 
 $cnt[StationMapper::class] = function ($cnt) {

@@ -2,6 +2,7 @@
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Psr\Log\LoggerInterface;
 use Slim\Container;
 use UMA\Bicing\API\Collector;
 use UMA\Bicing\CLI\ConsoleExceptionHandler;
@@ -32,8 +33,8 @@ $cnt[Updater::class] = function ($cnt) {
     return new Updater($cnt[Collector::class], $cnt[ObservationMapper::class]);
 };
 
-$cnt[ConsoleExceptionHandler::class] = function () {
-    return new ConsoleExceptionHandler();
+$cnt[ConsoleExceptionHandler::class] = function ($cnt) {
+    return new ConsoleExceptionHandler($cnt[LoggerInterface::class]);
 };
 
 set_exception_handler($cnt[ConsoleExceptionHandler::class]);

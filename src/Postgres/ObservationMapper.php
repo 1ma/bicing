@@ -26,6 +26,8 @@ class ObservationMapper
 
     public function recordObservation(Observation $observation): bool
     {
+        $this->rw->beginTransaction();
+
         $stmt = $this->rw->prepare(
             'INSERT INTO observations (station_id, bikes, slots, observed_at) VALUES '
             . str_pad('', 10*count($observation) - 1, '(?,?,?,?),')
@@ -47,7 +49,9 @@ class ObservationMapper
             $params[] = $observationDate;
         }
 
-        return $stmt->execute($params);
+        $stmt->execute($params);
+
+        return $this->rw->commit();
     }
 
     public function recordFailedObservation(): bool

@@ -12,7 +12,7 @@ use UMA\Bicing\Updater;
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../common.php';
 
-$cnt['paths.contracts'] = $cnt['paths.root'] . '/res/contracts';
+$cnt['paths.contracts'] = $cnt['paths.root'] . '/resources/contracts';
 
 $cnt[Client::class] = function ($cnt) {
     return new Client([

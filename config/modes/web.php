@@ -13,7 +13,7 @@ use UMA\Bicing\Slim\IndexAction;
 /** @var Container $cnt */
 $cnt = require_once __DIR__ . '/../common.php';
 
-$cnt['paths.templates'] = $cnt['paths.root'] . '/res/templates';
+$cnt['paths.templates'] = $cnt['paths.root'] . '/resources/templates';
 
 $cnt[Twig::class] = function ($cnt) {
     return new Twig($cnt['paths.templates']);

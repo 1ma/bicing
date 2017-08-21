@@ -21,7 +21,7 @@
         "devel-setup": [
             "@composer install --ignore-platform-reqs",
             "cp -n res/infrastructure/devel_pre-commit.sh .git/hooks/pre-commit",
-            "cp -n res/infrastructure/devel_settings.php app/settings.php",
+            "cp -n res/infrastructure/devel_settings.php config/settings.php",
             "cp -n res/infrastructure/devel_stack.yml docker-compose.yml",
             "docker-compose run --rm starter",
             "docker-compose exec -T pgsql sh -c \"psql -v ON_ERROR_STOP=1 -U postgres -d bicing_devel < /tmp/schema.sql\""

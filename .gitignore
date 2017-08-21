@@ -1,4 +1,4 @@
-/app/settings.php
+/config/settings.php
 /docker-compose.yml
 /var/
 !/var/.gitkeep
